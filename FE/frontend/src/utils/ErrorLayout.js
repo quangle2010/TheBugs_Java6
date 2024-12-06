@@ -1,0 +1,12 @@
+// ErrorLayout.js
+import React from 'react';
+
+const ErrorLayout = ({ children }) => {
+    return (
+        <div>
+            {children}
+        </div>
+    );
+};
+
+export default ErrorLayout;
