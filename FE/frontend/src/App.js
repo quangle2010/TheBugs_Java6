@@ -28,6 +28,7 @@ import axios from 'axios';
 import Err from './pages/404';
 import Resertpass from './pages/Resertpass';
 import StatisticsPage from './pages/statistical';
+import PaymentStatus from './pages/PaymentStatus';
 
 
 // Layout with Header and Footer
@@ -71,6 +72,7 @@ function Layout() {
         <Route path="/admin/list-category" element={isLoggedIn && userRole === true ? <CategoryManagment /> : <Navigate to="/login" />} />
         <Route path="/admin/statistical" element={isLoggedIn && userRole === true ? <StatisticsPage /> : <Navigate to="/login" />} />
         <Route path="/user/cart" element={<Cart />} />
+        <Route path="/user/payment-status" element={<PaymentStatus />} />
         <Route path="/author/profile" element={<Profile />} />
         <Route path="/user/list-ordered" element={<UserOrder />} />
         <Route path="/" element={<Navigate to="/home" />} />

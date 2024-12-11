@@ -47,6 +47,10 @@ public class Order {
     @Column(name = "address", nullable = false, columnDefinition = "NVARCHAR(50)")
     private String address;
 
+    @Column(name = "payment", nullable = false, columnDefinition = "BIT")
+    private boolean paymentMethod;
+    
+
     @Column(name = "create_at", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date createAt;

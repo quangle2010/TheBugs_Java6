@@ -15,6 +15,7 @@ import com.fpt.java.backend.mapper.OrderMapper;
 import com.fpt.java.backend.resp.ResponseData;
 import com.fpt.java.backend.service.OrderService;
 import com.fpt.java.backend.utils.JwtUtil;
+
 import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
@@ -56,7 +57,8 @@ public class OrderController {
             order.setFullName(orderBean.getFullName());
             order.setPhone(orderBean.getPhone());
             order.setAddress(orderBean.getAddress());
-
+            order.setPaymentMethod(orderBean.isPaymentMethod());
+            
             System.out.println(order.getAddress());
             System.out.println(order.getPhone());
 

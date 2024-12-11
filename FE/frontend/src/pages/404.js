@@ -12,7 +12,7 @@ const Err = () => {
                             <h3>404</h3>
                             <h4>Oops! That page can’t be found</h4>
                             <h5>Sorry, but the page you are looking for does not exist</h5>
-                            <Link to={"/home"} className="pink_btn">Go to home page</Link>
+                            <Link to={"/home"} className="pink_btn text-decoration-none">Về trang chủ</Link>
                         </div>
                     </div>
                 </div>

@@ -20,4 +20,5 @@ public class OrderDTO {
     private Double total;
     private ArrayList<OrderDetailDTO> orderDetails;
     private OrderStatusDTO orderStatus;
+    private boolean paymentMethod;
 }

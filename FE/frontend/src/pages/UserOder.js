@@ -88,6 +88,7 @@ const UserOrder = () => {
                                     <th scope="col">Ngày đặt hàng</th>
                                     <th scope="col">Trạng thái</th>
                                     <th scope="col">Tổng Tiền</th>
+                                    <th scope="col">Thanh toán</th>
                                     <th scope="col">Actions</th>
                                 </tr>
                             </thead>
@@ -100,6 +101,7 @@ const UserOrder = () => {
                                             <td>{formattedDate(item?.createAt)}</td>
                                             <td>{item?.orderStatus?.status}</td>
                                             <td> {formatCurrency(item.total)}</td>
+                                            <td> {item.paymentMethod? "Đã thanh toán" : "Chưa thanh toán"}</td>
                                             <td>
                                                 <button
                                                     className="bi bi-eye btn btn-primary mr-2"

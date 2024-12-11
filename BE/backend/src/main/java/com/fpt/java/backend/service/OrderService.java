@@ -53,6 +53,18 @@ public class OrderService {
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
+    public OrderDTO updatePaymentById(String id, boolean paymentMethod) {
+
+        try {
+            int ids = Integer.parseInt(id);
+            Optional<Order> order = orderJPA.findById(ids);
+            order.get().setPaymentMethod(paymentMethod);
+            return orderMapper.toDTO(orderJPA.save(order.get()));
+        } catch (Exception e) {
+            return new OrderDTO();
+        }
+    }
+
     public Order save(ConfirmOrderBean confirmOrderBean) {
         Optional<Order> opOrder = orderJPA.findById(confirmOrderBean.getId());
         if (!opOrder.isPresent()) {
@@ -103,18 +115,12 @@ public class OrderService {
     public OrderDTO ordered(String username, Order order) {
         User user = userJPA.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy user"));
-
-        Order ordered = new Order();
-        ordered.setUser(user);
-
-        ordered.setFullName(order.getFullName());
-        ordered.setPhone(order.getPhone());
-        ordered.setAddress(order.getAddress());
-
-        ordered.setCreateAt(new Date());
-        ordered.setOrderStatus(orderStatusJPA.findById(1)
+        order.setUser(user);
+        order.setCreateAt(new Date());
+        order.setOrderStatus(orderStatusJPA.findById(1)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy orderStatus")));
-        Order saveOrdered = orderJPA.save(ordered);
+
+        Order saveOrdered = orderJPA.save(order);
         List<CartItem> cartItems = user.getCart().getCartItems();
         for (CartItem cartItem : cartItems) {
             OrderDetail orderDetail = new OrderDetail();

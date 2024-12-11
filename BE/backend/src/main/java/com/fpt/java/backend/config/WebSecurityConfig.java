@@ -71,7 +71,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/login", "/comment/**", "/logout", "/register", "/",
                                 "/products",
-                                "/product-detail", "/images/**")
+                                "/product-detail", "/images/**", "/payment-online/**")
                         .permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(exceptionHandling -> exceptionHandling
