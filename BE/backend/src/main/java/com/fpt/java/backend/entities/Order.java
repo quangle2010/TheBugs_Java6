@@ -47,7 +47,7 @@ public class Order {
     @Column(name = "address", nullable = false, columnDefinition = "NVARCHAR(50)")
     private String address;
 
-    @Column(name = "payment", nullable = false, columnDefinition = "BIT")
+    @Column(name = "payment", nullable = true, columnDefinition = "BIT")
     private boolean paymentMethod;
     
 
