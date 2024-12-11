@@ -66,21 +66,21 @@ public class OrderService {
     }
 
     public Order save(ConfirmOrderBean confirmOrderBean) {
-        Optional<Order> opOrder = orderJPA.findById(confirmOrderBean.getId());
-        if (!opOrder.isPresent()) {
-            throw new IllegalArgumentException("Không tìm thấy order!");
-        }
-        Order order = opOrder.get();
+        Order order = orderJPA.findById(confirmOrderBean.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy order"));
+
+        OrderStatus orderStatus = orderStatusJPA.findById(confirmOrderBean.getStatus())
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy order"));
+
         if (order.getOrderStatus().getId() == 2) {
-            return order;
+            throw new IllegalStateException("Đơn hàng đã bị hủy, không thể thay đổi trạng thái.");
         }
-        Optional<OrderStatus> opOrderStatus = orderStatusJPA.findById(confirmOrderBean.getStatus());
-        if (!opOrderStatus.isPresent()) {
-            throw new IllegalArgumentException("Không tìm thấy orderStatus!");
+        if (!checkStatus(order, confirmOrderBean.getStatus())) {
+            throw new IllegalStateException("Trạng thái không hợp lệ để thay đổi.");
         }
-        order.setOrderStatus(opOrderStatus.get());
+        order.setOrderStatus(orderStatus);
         orderJPA.save(order);
-        if (order.getOrderStatus().getId() >= 3) {
+        if (order.getOrderStatus().getId() == 3) {
             boolean sufficientStock = true;
             ArrayList<String> nameproduct = new ArrayList<>();
             for (OrderDetail orderDetail : order.getOrderDetails()) {
@@ -110,6 +110,18 @@ public class OrderService {
             }
         }
         return order;
+
+    }
+
+    private boolean checkStatus(Order order, Integer newStatusId) {
+        if (order.getOrderStatus().getId() == 1 && (newStatusId == 2 || newStatusId == 3)) {
+            return true; // Chờ duyệt -> Đã duyệt
+        } else if (order.getOrderStatus().getId() == 3 && newStatusId == 4) {
+            return true; // Đã duyệt -> Đã giao
+        } else if (order.getOrderStatus().getId() == 4 && newStatusId == 5) {
+            return true; // Đã giao -> Đã nhận
+        }
+        return false;
     }
 
     public OrderDTO ordered(String username, Order order) {

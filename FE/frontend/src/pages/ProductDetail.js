@@ -25,7 +25,6 @@ const ProductDetail = () => {
         });
     };
 
-    // Fetch product details
     const fetchItems = useCallback(async () => {
         try {
             const response = await axios.get(`http://localhost:8080/product-detail?id=${productInfoId}`);
@@ -35,7 +34,6 @@ const ProductDetail = () => {
         }
     }, [productInfoId]);
 
-    // Fetch comments for the product
     const fetchComments = useCallback(async () => {
         try {
             const response = await axios.get(`http://localhost:8080/comment?productId=${productInfoId}`);
@@ -48,31 +46,34 @@ const ProductDetail = () => {
 
     const addToCart = async (productInfoId, quantity) => {
         try {
-            if (!token) {
-                showErrorToast("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!");
-                return;
-            }
+            if (token) {
+                const response = await axios.post(
+                    `${BASE_URLADD}/add-to-cart?productId=${productInfoId}&quantity=${quantity}`,
+                    {},
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
 
-            const response = await axios.post(
-                `${BASE_URLADD}/add-to-cart?productId=${productInfoId}&quantity=${quantity}`,
-                {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
+                if (response.data.status) {
+                    showSuccessToast(response.data.message);
+                } else {
+                    showErrorToast(response.data.message || "Có lỗi xảy ra, vui lòng thử lại!");
                 }
-            );
 
-            if (response.data.status) {
-                showSuccessToast(response.data.message);
             } else {
-                showErrorToast(response.data.message || "Có lỗi xảy ra, vui lòng thử lại!");
+                console.error("Không tìm thấy token");
+                showErrorToast("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng.");
             }
+
         } catch (err) {
             console.error("Error adding to cart:", err);
-            showErrorToast("Lỗi không xác định, vui lòng thử lại sau.");
+            showErrorToast(err.response?.data?.message || "Có lỗi xảy ra, vui lòng thử lại!");
         }
     };
+
 
     const deleteComment = async (id) => {
         try {
@@ -182,45 +183,52 @@ const ProductDetail = () => {
                             </div>
                         </div>
                         <div className="col-lg-6">
-                            <div className="product_details_text">
+                            <div className="product_details_text" style={{ marginBottom: "40px" }}>
                                 <h4 className="border-bottom-0">{items?.name || "Tên sản phẩm không có"}</h4>
                                 <p className="py-2 border-bottom-0">Thành phần: {items?.ingredients}</p>
                                 <p className="py-2 border-bottom-0 mb-4">Hương vị: {items?.flavor}</p>
                                 <h4 className="border-bottom-0">Giá: {formatCurrency(items?.price)}</h4>
-                                <div className="quantity_box d-flex justify-content-start align-item-center">
-                                    <h4 className="border-bottom-0 me-3">Quantity:</h4>
-                                    <div className="input-group bootstrap-touchspin border-0" style={{ width: "130px", alignItems: "center" }}>
-                                        <button
-                                            type="button"
-                                            className="btn btn-primary"
-                                            onClick={() => changeQuantity(-1)}
-                                        >
-                                            -
-                                        </button>
-                                        <input
-                                            type="number"
-                                            className="input-qty form-control text-center"
-                                            placeholder="1"
-                                            min="1"
-                                            value={quantity}
-                                            readOnly
-                                        />
-                                        <button
-                                            type="button"
-                                            className="btn btn-primary"
-                                            onClick={() => changeQuantity(1)}
-                                        >
-                                            +
-                                        </button>
+                                <div
+                                    className="row justify-content-center align-items-center"
+                                >
+                                    <h4 className="col-lg-4 pb-0 border-0">Số lượng:</h4>
+                                    <div className="col-lg-8">
+                                        <div className="d-flex justify-content-tart align-item-center" style={{ width: "200px" }}>
+                                            <button
+                                                type="button"
+                                                className="btn btn-primary"
+                                                onClick={() => changeQuantity(-1)}
+                                            >
+                                                -
+                                            </button>
+                                            <input
+                                                type="number"
+                                                className=""
+                                                placeholder="1"
+                                                min="1"
+                                                value={quantity}
+                                                readOnly
+                                                style={{ width: "80px", textAlign: "center" }}
+                                            />
+                                            <button
+                                                type="button"
+                                                className="btn btn-primary"
+                                                onClick={() => changeQuantity(1)}
+                                            >
+                                                +
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                                <button
-                                    className="btn btn-primary"
-                                    onClick={() => addToCart(productInfoId, quantity)}
-                                >
-                                    Thêm vào giỏ
-                                </button>
+
+
                             </div>
+                            <button
+                                className="btn btn-primary"
+                                onClick={() => addToCart(productInfoId, quantity)}
+                            >
+                                Thêm vào giỏ
+                            </button>
                         </div>
                     </div>
                 </div>

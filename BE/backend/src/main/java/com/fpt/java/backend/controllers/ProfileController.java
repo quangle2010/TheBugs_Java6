@@ -28,7 +28,7 @@ public class ProfileController {
 
     }
 
-    @PostMapping("/user/profile")
+    @PostMapping("/authur/profile")
     public ResponseEntity<ResponseData> postProfile(@RequestHeader("Authorization") String authorizationHeader,
             @RequestBody ProfileBean profileBean) {
         try {
@@ -48,7 +48,7 @@ public class ProfileController {
         }
     }
 
-    @GetMapping("/user/profile")
+    @GetMapping("/authur/profile")
     public ResponseEntity<ResponseData> getProfile(@RequestHeader("Authorization") String authorizationHeader) {
         try {
             String token = authorizationHeader.startsWith("Bearer ")

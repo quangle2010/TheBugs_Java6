@@ -24,7 +24,8 @@ public class ProductController {
     public ResponseEntity<ResponseData> getAllProduct() {
         try {
             return ResponseEntity.ok(new ResponseData(true, "pass",
-                    new ProductResponse(productService.getAllProduct(), categoryService.getAllCategory())));
+                    new ProductResponse(productService.gettAllProductActiveAndCategoryActive(),
+                            categoryService.getAllCategory())));
         } catch (Exception e) {
             return ResponseEntity.status(401).body(new ResponseData(false, e.getMessage(), null));
         }

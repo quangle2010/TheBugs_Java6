@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
-import axios from "axios";
-import { showErrorToast, showSuccessToast } from "../utils/Toast";
+import { NavLink, useNavigate, } from "react-router-dom";
+import { useAuth } from "../utils/useAuth";
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const { userInfo, isLoggedIn, logout } = useAuth();
   const navigate = useNavigate();
-  // Handle scroll event for sticky navbar
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 70);
@@ -18,76 +16,11 @@ const Header = () => {
   }, []);
 
 
-  const BASE_URL = 'http://localhost:8080/user/profile';
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userRole, setUserRole] = useState(false);
-  const [userName, setUserName] = useState([]);
-  const token = Cookies.get('JWT_TOKEN');
-  const fetchUserProfile = async () => {
-    try {
-      if (token) {
-        const response = await axios.get(BASE_URL, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const userData = response.data.data;
-        setIsLoggedIn(true);
-        setUserRole(userData.roles);
-        setUserName(userData.username);
-      } else {
-        setUserName(null);
-        setIsLoggedIn(false);
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-      setIsLoggedIn(false);
-      setUserName(null);
-    }
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login', { replace: true });
   };
-
-  useEffect(() => {
-    fetchUserProfile();
-  }, [token]);
-
-
-
-
-  const logout = async () => {
-    try {
-      const token = Cookies.get('JWT_TOKEN');
-      if (!token) {
-        showErrorToast("Token không hợp lệ hoặc không tồn tại.");
-        return;
-      }
-
-      const response = await axios.get("http://localhost:8080/logout", {
-        withCredentials: true,
-      });
-
-      if (response.data.status === true) {
-        showSuccessToast(response.data.message || "Đăng xuất thành công!");
-        Cookies.remove('JWT_TOKEN');
-        setIsLoggedIn(false);
-        navigate('/home');
-        setTimeout(() => {
-          window.location.reload();
-        }, 1500);
-      } else {
-        showErrorToast(response.data.message || "Không thể đăng xuất!");
-      }
-    } catch (error) {
-      console.error('Logout Error:', error);
-      if (error.response && error.response.status === 401) {
-        showErrorToast("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
-        Cookies.remove('JWT_TOKEN');
-        window.location.href = "/login";
-      } else {
-        showErrorToast("Đã xảy ra lỗi khi đăng xuất.");
-      }
-    }
-  };
-
 
 
   return (
@@ -138,13 +71,13 @@ const Header = () => {
               <ul className="navbar-nav justify-content-end">
                 <li><NavLink to="/home">Trang chủ</NavLink></li>
                 {
-                  isLoggedIn && userRole === true && (
+                  isLoggedIn && userInfo?.roles === true && (
                     <li className="dropdown submenu">
                       <a className="dropdown-toggle" href="#" role="button" data-toggle="dropdown">
                         Quản lý
                       </a>
                       <ul className="dropdown-menu">
-                        <li><NavLink to="/admin/list-user">Người dùng  </NavLink></li>
+                        <li><NavLink to="/admin/list-user">Người dùng</NavLink></li>
                         <li><NavLink to="/admin/list-product">Sản phẩm</NavLink></li>
                         <li><NavLink to="/admin/list-category">Loại sản phẩm</NavLink></li>
                         {
@@ -163,7 +96,7 @@ const Header = () => {
                 <li><NavLink to="/contact">Liên Hệ</NavLink></li>
                 <li className="dropdown submenu">
                   <a className="dropdown-toggle" href="#" role="button" data-toggle="dropdown">
-                    <i className="bi bi-person">{userName}</i>
+                    <i className="bi bi-person">{userInfo?.username}</i>
                   </a>
                   <ul className="dropdown-menu">
                     {isLoggedIn ? (
@@ -171,11 +104,11 @@ const Header = () => {
                         <li><NavLink to="/author/profile">Thông tin</NavLink></li>
                         <li><NavLink to="/author/resetpass">Đổi mật khẩu</NavLink></li>
                         {
-                          isLoggedIn && userRole === false && (
+                          isLoggedIn && userInfo?.roles === false && (
                             <li><NavLink to="/user/list-ordered">Đơn hàng</NavLink></li>
                           )
                         }
-                        <li><a href="#" onClick={logout}>Đăng xuất</a></li>
+                        <li><a href="#" onClick={handleLogout}>Đăng xuất</a></li>
                       </>
                     ) : (
                       <>
@@ -185,16 +118,22 @@ const Header = () => {
                     )}
                   </ul>
                 </li>
-                <li>
-                  <NavLink to="/user/cart">
-                    <i className="bi bi-cart shop_cart position-relative">
-                      <span
-                        className="badge position-absolute top-0 start-100 translate-middle"
-                        style={{ background: "#F195B2" }}
-                      ></span>
-                    </i>
-                  </NavLink>
-                </li>
+                {
+                  isLoggedIn && userInfo?.roles === false && (
+                    <li>
+                      <NavLink to="/user/cart">
+                        <i className="bi bi-cart shop_cart position-relative">
+                          <span
+                            className="badge position-absolute top-0 start-100 translate-middle"
+                            style={{ background: "#F195B2" }}
+                          ></span>
+                        </i>
+                      </NavLink>
+                    </li>
+                  )
+                }
+
+
               </ul>
             </div>
           </nav>

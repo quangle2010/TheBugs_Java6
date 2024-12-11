@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import axios from "axios";
-import { format } from "date-fns";
-import numeral from "numeral";
+
 import Cookies from 'js-cookie';
 import { formatCurrency, formattedDate } from "../utils/CurrencyUtils";
 import { closeModal, openModal } from "../utils/Modal";

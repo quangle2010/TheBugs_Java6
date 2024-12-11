@@ -87,6 +87,7 @@ const Cart = () => {
             );
             fetchItems();
         } catch (err) {
+            showErrorToast(err.response?.data?.message || "Có lỗi xảy ra, vui lòng thử lại!");
             console.error("Error updating cart:", err);
         }
     };
@@ -120,14 +121,12 @@ const Cart = () => {
                 window.location.href = "/login";
                 return;
             }
-            const orderRes = await axios.post(
-                "http://localhost:8080/user/ordered",
-                {
-                    fullName: data.fullName,
-                    phone: data.phone,
-                    address: data.address,
-                    paymentMethod: data.paymentMethod,
-                },
+            const response = await axios.post("http://localhost:8080/user/ordered", {
+                fullName: data.fullName,
+                phone: data.phone,
+                address: data.address,
+                payment: data.payment,
+            },
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -245,7 +244,7 @@ const Cart = () => {
                                                                                 updateCart(
                                                                                     item.id,
                                                                                     item.quantity -
-                                                                                        1
+                                                                                    1
                                                                                 )
                                                                             }
                                                                             title="Giảm số lượng"
@@ -269,7 +268,7 @@ const Cart = () => {
                                                                                 updateCart(
                                                                                     item.id,
                                                                                     item.quantity +
-                                                                                        1
+                                                                                    1
                                                                                 )
                                                                             }
                                                                             title="Tăng số lượng"
@@ -285,7 +284,7 @@ const Cart = () => {
                                                             {formatCurrency(
                                                                 item?.productDTO
                                                                     ?.price *
-                                                                    item?.quantity
+                                                                item?.quantity
                                                             )}
                                                         </td>
                                                         <td>
@@ -421,7 +420,7 @@ const Cart = () => {
                                                                                         item
                                                                                             ?.productDTO
                                                                                             ?.price *
-                                                                                            item?.quantity
+                                                                                        item?.quantity
                                                                                     )}
                                                                                 </td>
                                                                             </tr>
@@ -573,6 +572,16 @@ const Cart = () => {
                                                                             </label>
                                                                         </div>
                                                                     </div>
+                                                                </div>
+                                                                <div className="row mb-3">
+                                                                    <select
+                                                                        className="form-select"
+                                                                        aria-label="Default select example"
+                                                                        {...register("payment")}
+                                                                    >
+                                                                        <option value="true">True</option>
+                                                                        <option value="false">False</option>
+                                                                    </select>
                                                                 </div>
                                                             </div>
                                                         </div>

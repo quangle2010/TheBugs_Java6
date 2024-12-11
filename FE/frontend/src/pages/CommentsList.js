@@ -10,7 +10,7 @@ function CommentsList({ id, comments, onDelete, onEdit, onAdd }) {
   const fetchUserProfile = async () => {
     try {
       if (token) {
-        const response = await axios.get("http://localhost:8080/user/profile", {
+        const response = await axios.get("http://localhost:8080/authur/profile", {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -53,16 +53,15 @@ function CommentsList({ id, comments, onDelete, onEdit, onAdd }) {
   };
 
   const onSubmit = (data) => {
-    // Gọi hàm onAdd với id và nội dung bình luận (data.noted)
     onAdd(id, data.noted);
-    reset();  // Reset form sau khi gửi bình luận
+    reset();
   };
 
   return (
     <section className="main_blog_area p_100 p-0">
       <div className="container">
         <div className="s_comment_area" onSubmit={handleSubmit(onSubmit)}>
-          <h3 className="cm_title_br">Leave a comment</h3>
+          <h3 className="cm_title_br">Nhập bình luận của bạn</h3>
           <div className="s_comment_inner">
             <form className="row contact_us_form" >
               <div className="form-group col-md-12">
@@ -70,21 +69,20 @@ function CommentsList({ id, comments, onDelete, onEdit, onAdd }) {
                   className="form-control"
                   id="message"
                   rows="2"
-                  placeholder="Write your comment"
-                  {...register("noted", { required: "Please enter a comment!" })}
+                  placeholder="Viết bình luận của bạn"
+                  {...register("noted", { required: "Vui lòng nhập bình luận!" })}
                 />
                 {errors.noted && <p className="text-danger">{errors.noted.message}</p>}
               </div>
               <div className="form-group col-md-12">
                 <button className="btn order_s_btn form-control" >
-                  Post Comment
+                  Đăng
                 </button>
               </div>
             </form>
           </div>
         </div>
 
-        {/* Comments List */}
         <div className="row blog_area_inner">
           <div className="col-lg-12">
             <div className="main_blog_inner single_blog_inner">
@@ -94,14 +92,12 @@ function CommentsList({ id, comments, onDelete, onEdit, onAdd }) {
                     {comments && Array.isArray(comments) && comments.length > 0 ? (
                       comments.map((item) => {
                         if (!item) return null;
-
-                        // Check if the comment belongs to the current user
                         const isOwner = currentUser?.id === item.userId;
 
                         return (
                           <div className="media" key={item.id}>
                             <div className="d-flex">
-                              <img src="/assets/images/img/comment/comment-1.jpg" alt="avatar" />
+                              <img src="/assets/img/client/client-1.png" alt="" />
                             </div>
                             <div className="media-body">
                               <div className="d-flex justify-content-start align-items-center">
@@ -160,7 +156,7 @@ function CommentsList({ id, comments, onDelete, onEdit, onAdd }) {
                         );
                       })
                     ) : (
-                      <p>No comments yet.</p>
+                      <p className='m-4'>Sản phẩm chưa có bình luận</p>
                     )}
                   </div>
                 </div>

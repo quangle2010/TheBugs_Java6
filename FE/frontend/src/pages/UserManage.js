@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import axios from "axios";
 import { openModal, closeModal } from "../utils/Modal";
-import { toast } from "react-toastify";
 import Pagination from "../pagination/pagination";
 import UserTable from "../components/user/UserTable";
 import SaveModal from "../components/user/SaveModal";
@@ -135,9 +134,9 @@ const UserManagement = () => {
                 <div className="container">
                     <div className="table-responsive">
                         <div className="table-wrapper">
-                            <div className="table-title d-flex justify-content-start align-items-center" style={{ background: "#f195b2" }}>
+                            <div className="table-title d-flex justify-content-between align-items-center" style={{ background: "#f195b2" }}>
                                 <h2>Danh sách</h2>
-                                <div className="ms-4">
+                                <div className="filter">
                                     <input
                                         type="text"
                                         className="form-control"
@@ -146,6 +145,7 @@ const UserManagement = () => {
                                         placeholder="Nhập chữ cái để lọc"
                                     />
                                 </div>
+                                <div></div>
 
                             </div>
                             <UserTable

@@ -5,6 +5,9 @@ import java.util.Comparator;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +16,10 @@ import com.fpt.java.backend.entities.Cart;
 import com.fpt.java.backend.entities.User;
 import com.fpt.java.backend.repository.CartJPA;
 import com.fpt.java.backend.repository.UserJPA;
+import com.fpt.java.backend.utils.JwtUtil;
+
+import jakarta.mail.internet.MimeMessage;
+
 import com.fpt.java.backend.mapper.UserMapper;
 
 @Service
@@ -20,14 +27,17 @@ public class UserService {
 
     private final UserJPA userJPA;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final CartJPA cartJPA;
+    private final JwtUtil jwtUtil;
+    @Autowired
+    private JavaMailSender mailSender;
 
-    public UserService(UserJPA userJPA, BCryptPasswordEncoder passwordEncoder, CartJPA cartJPA) {
+    public UserService(UserJPA userJPA, BCryptPasswordEncoder passwordEncoder, CartJPA cartJPA, JwtUtil jwtUtil) {
         this.userJPA = userJPA;
         this.passwordEncoder = new BCryptPasswordEncoder();
         this.cartJPA = cartJPA;
+        this.jwtUtil = jwtUtil;
     }
-
-    private final CartJPA cartJPA;
 
     public ArrayList<UserDTO> getAllUser() {
         ArrayList<User> users = (ArrayList<User>) userJPA.pageAllUserByRolesFalse();
@@ -120,6 +130,39 @@ public class UserService {
         userJPA.save(user);
         return true;
 
+    }
+
+    public User finByEmail(String email) {
+        User user = userJPA.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Không tìm thấy user"));
+        return user;
+    }
+
+    public boolean forgotpass(String email) {
+        try {
+            User u = finByEmail(email);
+            String token = jwtUtil.generateToken(u.getUsername());
+            String resetPasswordLink = "https://your-website.com/reset-password?token=" + token;
+            String htmlContent = "<html><body>"
+                    + "<h3>Xin chào,</h3>"
+                    + "<p>Chúng tôi đã nhận được yêu cầu khôi phục mật khẩu cho tài khoản của bạn.</p>"
+                    + "<p>Nhấp vào nút dưới đây để đặt lại mật khẩu của bạn:</p>"
+                    + "<a href='" + resetPasswordLink + "' style='"
+                    + "background-color: #4CAF50; color: white; padding: 10px 20px; text-align: center; text-decoration: none; font-size: 16px;'>"
+                    + "Đặt lại mật khẩu</a>"
+                    + "<p>Trân trọng,</p>"
+                    + "<p>Nhóm hỗ trợ của chúng tôi</p>"
+                    + "</body></html>";
+
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setTo(u.getEmail());
+            helper.setSubject("Đặt lại mật khẩu của bạn");
+            helper.setText(htmlContent, true);
+            mailSender.send(message);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
 }
