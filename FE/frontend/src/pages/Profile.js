@@ -6,7 +6,7 @@ import { showErrorToast, showSuccessToast } from "../utils/Toast";
 import Cookies from 'js-cookie';
 const Profile = () => {
     const namePage = "Thông tin";
-    const BASE_URL = "http://localhost:8080/user/profile";
+    const BASE_URL = "http://localhost:8080/authur/profile";
     const { register, handleSubmit, formState: { errors }, setValue, setError } = useForm();
     const token = Cookies.get('JWT_TOKEN');
     const fetchUserProfile = async () => {
@@ -38,7 +38,7 @@ const Profile = () => {
 
     const onSubmit = async (data) => {
         try {
-            const response = await axios.post("http://localhost:8080/user/profile", {
+            const response = await axios.post("http://localhost:8080/authur/profile", {
                 name: data.name,
                 email: data.email,
                 phone: data.phone,

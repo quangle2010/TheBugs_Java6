@@ -2,14 +2,15 @@ import React from 'react';
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import { ToastContainer } from 'react-toastify';
 import Cookies from 'js-cookie';
 import { showErrorToast, showSuccessToast } from '../utils/Toast';
 import axios from 'axios';
+import { useAuth } from '../utils/useAuth';
 const Login = () => {
     const namePage = "Đăng nhập";
     const { register, handleSubmit, formState: { errors } } = useForm();
     const navigate = useNavigate();
+    const { login } = useAuth();
     const onSubmit = async (data) => {
         try {
             const response = await axios.post("http://localhost:8080/login", {
@@ -19,9 +20,10 @@ const Login = () => {
 
             if (response.data.status === true) {
                 Cookies.set('JWT_TOKEN', response.data.data, { expires: 7, secure: true });
-
                 showSuccessToast(response.data.message);
                 navigate('/home', { replace: true });
+                window.location.reload();
+                login(response.data.data);
             } else {
                 showErrorToast(response.data.message || "Đăng nhập thất bại");
             }

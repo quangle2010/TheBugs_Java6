@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import axios from "axios";
 import { openModal, closeModal } from "../utils/Modal";
@@ -8,22 +8,24 @@ import SaveModal from "../components/category/SaveModal";
 import DeleteModal from "../components/DeleteModal";
 import Cookies from 'js-cookie';
 import { showErrorToast, showSuccessToast } from "../utils/Toast";
+import { Spinner } from "react-bootstrap";
 
 const CategoryManagement = () => {
     const namePage = "Danh sách loại sản phẩm";
     const BASE_URL = "http://localhost:8080/admin/api/categories";
-
+    const [selected, setSelected] = useState(null);
     const [items, setItems] = useState([]);
+    const [loading, setLoading] = useState(false);
     const [filteredItems, setFilteredItems] = useState([]);
     const [searchItems, setSearchItems] = useState("");
-    const [selected, setSelected] = useState(null);
+    const [statusFilter, setStatusFilter] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
     const token = Cookies.get('JWT_TOKEN');
 
-    const fetchItems = async () => {
+    const fetchItems = useCallback(async () => {
+        setLoading(true);
         try {
-
             if (token) {
                 const response = await axios.get(`${BASE_URL}/list`, {
                     headers: {
@@ -37,18 +39,31 @@ const CategoryManagement = () => {
                 console.error("Không tìm thấy token");
             }
         } catch (error) {
-            console.error("Lỗi đỗ dữ liệu categoties:", error);
+            console.error("Lỗi đỗ dữ liệu categories:", error);
+        } finally {
+            setLoading(false);
         }
-    };
+    }, [token]);
 
     useEffect(() => {
         fetchItems();
-    }, []);
-    const handleSearch = (e) => {
-        const search = e.target.value.toLowerCase();
-        setSearchItems(search);
-        setFilteredItems(items.filter(item => item.name.toLowerCase().includes(search)));
+    }, [token]);
+
+    useEffect(() => {
+        const filtered = items.filter((item) => {
+            const matchesSearch = item.name.toLowerCase().includes(searchItems.toLowerCase());
+            const matchesStatus = statusFilter === '' || item.active === (statusFilter === 'true');
+            return matchesSearch && matchesStatus;
+        });
+        setFilteredItems(filtered);
         setCurrentPage(1);
+    }, [items, searchItems, statusFilter]);
+    const handleSearchChange = (e) => {
+        setSearchItems(e.target.value);
+    };
+
+    const handleStatusChange = (e) => {
+        setStatusFilter(e.target.value);
     };
 
     const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
@@ -120,63 +135,86 @@ const CategoryManagement = () => {
 
 
     return (
+
         <>
             <Helmet>
                 <title>{namePage}</title>
             </Helmet>
             <div className="cart_table_area p_100">
                 <div className="container">
-                    <div className="table-responsive">
-                        <div className="table-wrapper">
-                            <div className="table-title d-flex justify-content-between align-items-center" style={{ background: "#f195b2" }}>
-                                <h2>Danh sách</h2>
-                                <div className="filter">
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        value={searchItems}
-                                        onChange={handleSearch}
-                                        placeholder="Nhập chữ cái để lọc"
-                                    />
-                                </div>
-                                <div>
-                                    <button
-
-                                        className="btn btn-primary mr-2"
-                                        onClick={() => {
-                                            setSelected(null);
-                                            openModal("saveModal");
-                                        }}
-                                    >
-                                        Thêm
-                                    </button>
-
-                                </div>
+                    {
+                        loading ? (
+                            <div className="text-center">
+                                <Spinner animation="border" role="status">
+                                    <span className="visually-hidden">Loading...</span>
+                                </Spinner>
                             </div>
-                            <CategoryTable
-                                items={currentItems}
-                                onEdit={(item) => {
-                                    console.log(item);
-                                    setSelected(item);
-                                    openModal("saveModal");
+                        ) : (
+                            <div>
+                                <div className="table-responsive">
+                                    <div className="table-wrapper">
+                                        <div className="table-title d-flex justify-content-between align-items-center" style={{ background: "#f195b2" }}>
+                                            <h2>Danh sách</h2>
+                                            <div className="filter">
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    value={searchItems}
+                                                    onChange={handleSearchChange}
+                                                    placeholder="Nhập chữ cái để lọc"
+                                                />
+                                            </div>
+                                            <div>
+                                                <select class="form-select"
+                                                    onChange={handleStatusChange} value={statusFilter}>
+                                                    <option value="">Chọn trạng thái...</option>
+                                                    <option value="true">Còn hoạt động</option>
+                                                    <option value="false">Ngừng hoạt động</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <button
 
-                                }}
-                                onDelete={(item) => {
-                                    setSelected(item);
-                                    openModal("delete");
-                                }}
-                            />
-                        </div>
-                    </div>
-                    <Pagination
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={handlePageChange}
-                        totalElements={items.length}
-                        itemsPerPage={itemsPerPage}
-                    />
+                                                    className="btn btn-primary mr-2"
+                                                    onClick={() => {
+                                                        setSelected(null);
+                                                        openModal("saveModal");
+                                                    }}
+                                                >
+                                                    Thêm
+                                                </button>
+
+                                            </div>
+                                        </div>
+                                        <CategoryTable
+                                            items={currentItems}
+                                            onEdit={(item) => {
+                                                console.log(item);
+                                                setSelected(item);
+                                                openModal("saveModal");
+
+                                            }}
+                                            onDelete={(item) => {
+                                                setSelected(item);
+                                                openModal("delete");
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                <Pagination
+                                    currentPage={currentPage}
+                                    totalPages={totalPages}
+                                    onPageChange={handlePageChange}
+                                    totalElements={items.length}
+                                    itemsPerPage={itemsPerPage}
+                                />
+                            </div>
+                        )
+                    }
+
                 </div>
             </div>
+
             <SaveModal selected={selected} onSubmit={saveItem} />
             <DeleteModal selected={selected} onDelete={deleteItem} />
         </>

@@ -28,49 +28,23 @@ import axios from 'axios';
 import Err from './pages/404';
 import Resertpass from './pages/Resertpass';
 import StatisticsPage from './pages/statistical';
+import { useAuth } from './utils/useAuth';
+import PaymentStatus from './pages/PaymentStatus';
 
-
-// Layout with Header and Footer
 function Layout() {
-  const location = useLocation();
-  const BASE_URL = 'http://localhost:8080/user/profile';
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userRole, setUserRole] = useState(false);
-  const token = Cookies.get('JWT_TOKEN');
-  const fetchUserProfile = async () => {
-    try {
-      if (token) {
-        const response = await axios.get(BASE_URL, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const userData = response.data.data;
-        setIsLoggedIn(true);
-        setUserRole(userData.roles);
-      } else {
-        setIsLoggedIn(false);
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-      setIsLoggedIn(false);
-    }
-  };
 
-  useEffect(() => {
-    fetchUserProfile();
-  }, [token]);
-
+  const { isLoggedIn, userInfo } = useAuth();
   return (
     <>
       <Header />
       <Routes>
-        <Route path="/admin/list-product" element={isLoggedIn && userRole === true ? <ProductsManage /> : <Navigate to="/login" />} />
-        <Route path="/admin/list-ordered" element={isLoggedIn && userRole === true ? <OrderedManagment /> : <Navigate to="/login" />} />
-        <Route path="/admin/list-user" element={isLoggedIn && userRole === true ? <User /> : <Navigate to="/login" />} />
-        <Route path="/admin/list-category" element={isLoggedIn && userRole === true ? <CategoryManagment /> : <Navigate to="/login" />} />
-        <Route path="/admin/statistical" element={isLoggedIn && userRole === true ? <StatisticsPage /> : <Navigate to="/login" />} />
+        <Route path="/admin/list-product" element={isLoggedIn && userInfo?.roles === true ? <ProductsManage /> : <Navigate to="/login" />} />
+        <Route path="/admin/list-ordered" element={isLoggedIn && userInfo?.roles === true ? <OrderedManagment /> : <Navigate to="/login" />} />
+        <Route path="/admin/list-user" element={isLoggedIn && userInfo?.roles === true ? <User /> : <Navigate to="/login" />} />
+        <Route path="/admin/list-category" element={isLoggedIn && userInfo?.roles === true ? <CategoryManagment /> : <Navigate to="/login" />} />
+        <Route path="/admin/statistical" element={isLoggedIn && userInfo?.roles === true ? <StatisticsPage /> : <Navigate to="/login" />} />
         <Route path="/user/cart" element={<Cart />} />
+        <Route path="/user/payment-status" element={<PaymentStatus />} />
         <Route path="/author/profile" element={<Profile />} />
         <Route path="/user/list-ordered" element={<UserOrder />} />
         <Route path="/" element={<Navigate to="/home" />} />

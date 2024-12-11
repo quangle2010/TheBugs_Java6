@@ -6925,7 +6925,7 @@ th:nth-child(5), td:nth-child(5) {
 }
 
 .input-qty {
-  width: 60px; /* Đặt chiều rộng cho input */
+  width: 200px; /* Đặt chiều rộng cho input */
   border: none; /* Không có đường viền */
   text-align: center; /* Căn giữa nội dung */
   padding: 10px; /* Padding cho input */

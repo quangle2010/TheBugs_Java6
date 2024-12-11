@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Helmet } from "react-helmet";
 import { useForm } from "react-hook-form";
 import axios from "axios";
@@ -17,6 +17,9 @@ const OrderedManagement = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
     const [order_Status, setOrder_Status] = useState([]);
+    const [startDate, setStartDate] = useState("");  // Start date state
+    const [endDate, setEndDate] = useState("");
+    const [orderStatus, setOrderStatus] = useState("");
     const { register, handleSubmit, reset } = useForm();
     const token = Cookies.get('JWT_TOKEN');
     const fetchItems = async () => {
@@ -48,7 +51,7 @@ const OrderedManagement = () => {
         try {
             if (token) {
                 const payload = selected ? { ...data, id: selected.id } : data;
-                const response = await axios.post(`${BASE_URL}/save`, payload , {
+                const response = await axios.post(`${BASE_URL}/save`, payload, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
@@ -74,12 +77,30 @@ const OrderedManagement = () => {
             }
         }
     };
+
+    useEffect(() => {
+        const filtered = items.filter((item) => {
+            const matchesStartDate = startDate
+                ? new Date(item?.createAt) >= new Date(startDate)
+                : true;
+            const matchesEndDate = endDate
+                ? new Date(item?.createAt) <= new Date(endDate)
+                : true;
+            const matchesStatus = orderStatus
+                ? item?.orderStatus?.id === parseInt(orderStatus)
+                : true;
+
+            return matchesStartDate && matchesEndDate && matchesStatus;
+        });
+
+        setFilteredItems(filtered);
+    }, [items, startDate, endDate, orderStatus]);
+
     const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
     const currentItems = filteredItems.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
-
 
     const handlePageChange = (page) => {
         if (page >= 1 && page <= totalPages) setCurrentPage(page);
@@ -104,6 +125,9 @@ const OrderedManagement = () => {
                                             className="form-control"
                                             id="startDate"
                                             name="startDate"
+                                            value={startDate}  // Bind state to input
+                                            onChange={(e) => { setStartDate(e.target.value) }} // Trigger search
+
                                         />
                                     </div>
                                 </div>
@@ -116,6 +140,8 @@ const OrderedManagement = () => {
                                             className="form-control"
                                             id="endDate"
                                             name="endDate"
+                                            value={endDate}  // Bind state to input
+                                            onChange={(e) => { setEndDate(e.target.value); }} // Trigger search
                                         />
 
                                     </div>
@@ -124,8 +150,10 @@ const OrderedManagement = () => {
                                 <div>
                                     <select
                                         className="form-select"
-                                        id="status"
-                                        name="status"
+                                        id="orderStatus"
+                                        name="orderStatus"
+                                        value={orderStatus}
+                                        onChange={(e) => { setOrderStatus(e.target.value); }}
                                     >
                                         <option value="">Chọn trạng thái...</option>
                                         {order_Status?.map((status, index) => (

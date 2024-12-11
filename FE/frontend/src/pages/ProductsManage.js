@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import axios from "axios";
 import { openModal, closeModal } from "../utils/Modal";
@@ -17,15 +17,15 @@ const ProductsManage = () => {
     const [searchItems, setSearchItems] = useState("");
     const [selected, setSelected] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
+    const [statusFilter, setStatusFilter] = useState("");
     const itemsPerPage = 10;
     const token = Cookies.get('JWT_TOKEN');
-    const fetchItems = async () => {
+    const fetchItems = useCallback(async () => {
         try {
-           
             if (token) {
                 const response = await axios.get(`${BASE_URL}/list`, {
                     headers: {
-                        Authorization: `Bearer ${token}` 
+                        Authorization: `Bearer ${token}`
                     }
                 });
                 const data = response.data.data || [];
@@ -35,19 +35,31 @@ const ProductsManage = () => {
                 console.error("Không tìm thấy token");
             }
         } catch (error) {
-            console.error("Lỗi đỗ dữ liệu products:", error);
+            console.error("Lỗi đỗ dữ liệu prouct:", error);
         }
-    };
+    }, [token]);
+
     useEffect(() => {
         fetchItems();
-    }, []);
+    }, [token]);
 
-    const handleSearch = (e) => {
-        const search = e.target.value.toLowerCase();
-        setSearchItems(search);
-        setFilteredItems(items.filter(item => item.name.toLowerCase().includes(search)));
+    useEffect(() => {
+        const filtered = items.filter((item) => {
+            const matchesSearch = item.name.toLowerCase().includes(searchItems.toLowerCase());
+            const matchesStatus = statusFilter === '' || item.active === (statusFilter === 'true');
+            return matchesSearch && matchesStatus;
+        });
+        setFilteredItems(filtered);
         setCurrentPage(1);
+    }, [items, searchItems, statusFilter]);
+    const handleSearchChange = (e) => {
+        setSearchItems(e.target.value);
     };
+
+    const handleStatusChange = (e) => {
+        setStatusFilter(e.target.value);
+    };
+
 
     const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
     const currentItems = filteredItems.slice(
@@ -83,7 +95,7 @@ const ProductsManage = () => {
             console.log(formData);
             const response = await axios.post("http://localhost:8080/admin/api/products/save", formData, {
                 headers: {
-                    Authorization: `Bearer ${token}` 
+                    Authorization: `Bearer ${token}`
                 }
             });
 
@@ -140,9 +152,17 @@ const ProductsManage = () => {
                                         type="text"
                                         className="form-control"
                                         value={searchItems}
-                                        onChange={handleSearch}
+                                        onChange={handleSearchChange}
                                         placeholder="Nhập chữ cái để lọc"
                                     />
+                                </div>
+                                <div>
+                                    <select class="form-select"
+                                        onChange={handleStatusChange} value={statusFilter}>
+                                        <option value="">Chọn trạng thái...</option>
+                                        <option value="true">Còn hoạt động</option>
+                                        <option value="false">Ngừng hoạt động</option>
+                                    </select>
                                 </div>
                                 <div>
                                     <button className="btn btn-primary mr-2" onClick={() => { setSelected(null); openModal("saveModal"); }}>Thêm</button>
