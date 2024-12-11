@@ -3,7 +3,6 @@ package com.fpt.java.backend.dto;
 import java.util.ArrayList;
 import java.util.Date;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +17,7 @@ public class OrderDTO {
     private String address;
     private Date createAt;
     private Double total;
+    private boolean paymentMethod;
     private ArrayList<OrderDetailDTO> orderDetails;
     private OrderStatusDTO orderStatus;
 }

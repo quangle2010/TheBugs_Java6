@@ -56,7 +56,6 @@ public class OrderController {
             order.setFullName(orderBean.getFullName());
             order.setPhone(orderBean.getPhone());
             order.setAddress(orderBean.getAddress());
-
             System.out.println(order.getAddress());
             System.out.println(order.getPhone());
 

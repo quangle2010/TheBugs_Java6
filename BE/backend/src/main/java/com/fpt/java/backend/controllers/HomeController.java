@@ -25,7 +25,6 @@ public class HomeController {
     public ResponseEntity<ResponseData> getHomePage() {
         try {
 
-            // Tạo phản hồi thành công
             ResponseData responseData = new ResponseData();
             responseData.setStatus(true);
             responseData.setMessage("Dữ liệu trang chủ được tải thành công");
@@ -33,10 +32,7 @@ public class HomeController {
                     commentService.getTop2Comment()));
             return ResponseEntity.ok(responseData);
         } catch (Exception e) {
-            // Log the exception
             e.printStackTrace();
-
-            // Tạo phản hồi lỗi
             ResponseData responseData = new ResponseData();
             responseData.setStatus(false);
             responseData.setMessage("Đã xảy ra lỗi khi tải dữ liệu trang chủ");

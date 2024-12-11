@@ -1,4 +1,5 @@
 package com.fpt.java.backend.utils;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fpt.java.backend.resp.ResponseData;
 
@@ -16,16 +17,17 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     private final ObjectMapper objectMapper;
 
     public CustomAuthenticationEntryPoint() {
-        this.objectMapper = new ObjectMapper(); // Initialize ObjectMapper
+        this.objectMapper = new ObjectMapper();
     }
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+    public void commence(HttpServletRequest request, HttpServletResponse response,
+            AuthenticationException authException) throws IOException, ServletException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json;charset=UTF-8");
 
-        ResponseData responseData = new ResponseData(false, "Không có quyền truy cập", null);  // Custom response
-        String jsonResponse = objectMapper.writeValueAsString(responseData); // Convert to JSON
+        ResponseData responseData = new ResponseData(false, "Không có quyền truy cập", null);
+        String jsonResponse = objectMapper.writeValueAsString(responseData);
 
         response.getWriter().write(jsonResponse);
     }

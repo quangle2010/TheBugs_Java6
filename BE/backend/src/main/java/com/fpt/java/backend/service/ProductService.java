@@ -35,6 +35,14 @@ public class ProductService {
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
+    public ArrayList<ProductDTO> gettAllProductActiveAndCategoryActive() {
+        ArrayList<Product> products = (ArrayList<Product>) productJPA.findAllByProductActiveAndCategoryActive();
+        return products.stream()
+                .map(productMapper::toDTO)
+                .sorted(Comparator.comparing(ProductDTO::getId).reversed())
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
     public ProductService(ProductJPA productJPA, ProductMapper productMapper, ImageJPA imageJPA) {
         this.productJPA = productJPA;
         this.productMapper = productMapper;
