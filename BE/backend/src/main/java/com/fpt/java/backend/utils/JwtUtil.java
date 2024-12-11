@@ -11,8 +11,8 @@ import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JwtUtil {
-    private static final String SECRET_KEY = "IUhuQQpG1l3gA5aFf9SjfjRau2WiXYDIORDGWkggqNBIv4aGb5"; // Khóa bí mật
-    private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 7; // Hết hạn 2 giờ
+    private static final String SECRET_KEY = "IUhuQQpG1l3gA5aFf9SjfjRau2WiXYDIORDGWkggqNBIv4aGb5";
+    private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 7;
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());

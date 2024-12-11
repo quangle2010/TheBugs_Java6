@@ -56,6 +56,7 @@ const Cart = () => {
             );
             fetchItems();
         } catch (err) {
+            showErrorToast(err.response?.data?.message || "Có lỗi xảy ra, vui lòng thử lại!");
             console.error("Error updating cart:", err);
         }
     };
@@ -89,6 +90,7 @@ const Cart = () => {
                 fullName: data.fullName,
                 phone: data.phone,
                 address: data.address,
+                payment: data.payment,
             }, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -292,6 +294,16 @@ const Cart = () => {
                                                                         ></textarea>
                                                                         {errors.address && <span className="text-danger">{errors.address.message}</span>}
                                                                     </div>
+                                                                </div>
+                                                                <div className="row mb-3">
+                                                                    <select
+                                                                        className="form-select"
+                                                                        aria-label="Default select example"
+                                                                        {...register("payment")}
+                                                                    >
+                                                                        <option value="true">True</option>
+                                                                        <option value="false">False</option>
+                                                                    </select>
                                                                 </div>
                                                             </div>
                                                         </div>

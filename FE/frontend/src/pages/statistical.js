@@ -190,11 +190,13 @@ const StatisticsPage = () => {
                                 {
                                     id: "sparkRevenue",
                                     name: "Doanh thu",
-                                    data: Array.isArray(
-                                        sparkChartsData.revenue?.values
-                                    )
-                                        ? sparkChartsData.revenue.values
-                                        : [],
+                                    data:
+
+                                        Array.isArray(
+                                            sparkChartsData.revenue?.values
+                                        )
+                                            ? sparkChartsData.revenue.values
+                                            : [],
                                 },
                             ]}
                             labels={sparkChartsData.revenue?.date || []} // Sử dụng toán tử optional chaining

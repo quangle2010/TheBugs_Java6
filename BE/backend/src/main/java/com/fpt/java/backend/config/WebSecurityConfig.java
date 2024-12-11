@@ -66,13 +66,16 @@ public class WebSecurityConfig {
                     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     configuration.setAllowedHeaders(Arrays.asList("*"));
                     configuration.setAllowCredentials(true);
+
                     return configuration;
                 }))
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/login", "/comment/**", "/logout", "/register", "/",
+                        .requestMatchers("/login", "/comment/**", "/logout", "/register", "/home", "/",
                                 "/products",
-                                "/product-detail", "/images/**")
+                                "/product-detail", "/images/**", "/forgotpassword")
                         .permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/user/**").hasRole("USER")
                         .anyRequest().authenticated())
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(customAuthenticationEntryPoint()))

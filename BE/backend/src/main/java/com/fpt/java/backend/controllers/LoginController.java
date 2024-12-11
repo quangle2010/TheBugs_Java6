@@ -36,7 +36,7 @@ public class LoginController {
                         .body(new ResponseData(false, errorMessages, null));
             }
             String token = loginService.login(loginBean.getUsername(), loginBean.getPassword());
-            return ResponseEntity.ok(new ResponseData(true, "Login susscess", token));
+            return ResponseEntity.ok(new ResponseData(true, "Đăng nhập thành công", token));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseData(true, e.getMessage(), null));
         }
